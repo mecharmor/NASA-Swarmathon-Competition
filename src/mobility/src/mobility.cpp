@@ -31,6 +31,8 @@
 
 using namespace std;
 
+# define M_50_DEG 0.87266462599 /* (50/180) pi */
+
 // Random number generator
 random_numbers::RandomNumberGenerator* rng;
 
@@ -41,6 +43,11 @@ SearchController searchController;
 
 // Mobility Logic Functions
 void sendDriveCommand(double linearVel, double angularVel);
+
+//COS: Send Claw command
+void sendClawCommand(float angleData);
+void sendClawWristCommand(float clawWristAngleData);
+
 void openFingers(); // Open fingers to 90 degrees
 void closeFingers();// Close fingers to 0 degrees
 void raiseWrist();  // Return wrist back to 0 degrees
@@ -503,15 +510,23 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     else {
         // publish current state for the operator to see
         stateMachineMsg.data = "WAITING";
-        //my AI
+
+        //Open the claw (fingers)
+        openFingers();
+        raiseWrist();
+
+        //COS: AI
         sendDriveCommand(1.5,0);
-        
-        ROS_INFO_STREAM("my message: "<< cosObstacleInt);
 
         if(cosObstacleInt>0){
             sendDriveCommand(-1.0,1);
+            closeFingers();
+            lowerWrist();
         }
-
+        else {
+           openFingers();
+           raiseWrist();
+        }
     }
 
     // publish state machine string for user, only if it has changed, though
@@ -520,6 +535,53 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
     }
 }
+
+void openFingers()
+{
+    sendClawCommand(M_PI_2);
+}
+
+void closeFingers()
+{
+   sendClawCommand(0); 
+}
+
+//COS: Return wrist back to 0 degrees
+void raiseWrist()
+{
+    sendClawWristCommand(0);
+}
+//COS: Lower wrist to 50 degrees
+void lowerWrist()
+{
+    sendClawWristCommand(M_50_DEG);
+}
+
+//COS: Claw wrist command.
+void sendClawWristCommand(float clawWristAngleData)
+{
+    // set gripper
+    std_msgs::Float32 angle;
+
+    // open fingers
+    angle.data = clawWristAngleData;
+    wristAnglePublish.publish(angle);
+    angle.data = 0;
+}
+
+//COS: Open claw/finger
+void sendClawCommand(float angleData)
+{
+    // set gripper
+    std_msgs::Float32 angle;
+
+    // open fingers
+    angle.data = angleData;
+
+    fingerAnglePublish.publish(angle);
+    angle.data = 0;
+}
+
 
 void sendDriveCommand(double linearVel, double angularError)
 {
