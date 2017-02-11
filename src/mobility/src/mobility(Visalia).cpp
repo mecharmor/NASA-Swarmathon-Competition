@@ -31,6 +31,8 @@
 
 using namespace std;
 
+# define M_50_DEG 0.87266462599 /* (50/180) pi */
+
 // Random number generator
 random_numbers::RandomNumberGenerator* rng;
 
@@ -41,6 +43,11 @@ SearchController searchController;
 
 // Mobility Logic Functions
 void sendDriveCommand(double linearVel, double angularVel);
+
+//COS: Send Claw command
+void sendClawCommand(float angleData);
+void sendClawWristCommand(float clawWristAngleData);
+
 void openFingers(); // Open fingers to 90 degrees
 void closeFingers();// Close fingers to 0 degrees
 void raiseWrist();  // Return wrist back to 0 degrees
@@ -63,6 +70,10 @@ float status_publish_interval = 1;
 float killSwitchTimeout = 10;
 bool targetDetected = false;
 bool targetCollected = false;
+
+// COS: globals
+int cosObstacleInt = 0;
+bool cosTargetDetected = false;
 
 // Set true when the target block is less than targetDist so we continue
 // attempting to pick it up rather than switching to another block in view.
@@ -167,6 +178,7 @@ int main(int argc, char **argv) {
     gethostname(host, sizeof (host));
     string hostname(host);
 
+
     // instantiate random number generator
     rng = new random_numbers::RandomNumberGenerator();
 
@@ -264,6 +276,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         // init code goes here. (code that runs only once at start of
         // auto mode but wont work in main goes here)
         if (!init) {
+            ROS_INFO_STREAM("INIT CODE GOES HERE *********************************"<<host);       
             if (timerTimeElapsed > startDelayInSeconds) {
                 // Set the location of the center circle location in the map
                 // frame based upon our current average location on the map.
@@ -301,6 +314,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         // If no adjustment needed, select new goal
         case STATE_MACHINE_TRANSFORM: {
             stateMachineMsg.data = "TRANSFORMING";
+            ROS_INFO_STREAM("STATE *********************************"<<stateMachineMsg.data);
 
             // If returning with a target
             if (targetCollected && !avoidingObstacle) {
@@ -351,7 +365,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     goalLocation = currentLocation;
                     sendDriveCommand(result.cmdVel,result.angleError);
                     stateMachineState = STATE_MACHINE_TRANSFORM;
-
+                    ROS_INFO_STREAM("AND ** vel "<<result.cmdVel <<" and angleError "<< result.angleError);
                     break;
                 }
             }
@@ -499,6 +513,33 @@ void mobilityStateMachine(const ros::TimerEvent&) {
     else {
         // publish current state for the operator to see
         stateMachineMsg.data = "WAITING";
+
+        //Open the claw (fingers)
+        //openFingers();
+        //lowerWrist();
+
+        //COS: AI
+        //sendDriveCommand(0.5,0);
+        ROS_INFO_STREAM("Target Detected? "<<cosTargetDetected);
+
+        if(cosObstacleInt>0){
+            sendDriveCommand(-1.0,1);
+            closeFingers();
+            raiseWrist();
+        }
+        else {
+           openFingers();
+           lowerWrist();
+           sendDriveCommand(1.0,0);
+           if(cosTargetDetected){
+               PickUpResult result;
+               result = pickUpController.pickUpSelectedTarget(true);
+               ROS_INFO_STREAM("PickupController? vel "<<result.cmdVel<<" angle "<<result.angleError);
+               //sendDriveCommand(result.cmdVel,result.angleError);
+               sendDriveCommand(0.25,result.angleError);
+           }
+        }
+
     }
 
     // publish state machine string for user, only if it has changed, though
@@ -507,6 +548,53 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         sprintf(prev_state_machine, "%s", stateMachineMsg.data.c_str());
     }
 }
+
+void openFingers()
+{
+    sendClawCommand(M_PI_2);
+}
+
+void closeFingers()
+{
+   sendClawCommand(0); 
+}
+
+//COS: Return wrist back to 0 degrees
+void raiseWrist()
+{
+    sendClawWristCommand(0);
+}
+//COS: Lower wrist to 50 degrees
+void lowerWrist()
+{
+    sendClawWristCommand(M_50_DEG);
+}
+
+//COS: Claw wrist command.
+void sendClawWristCommand(float clawWristAngleData)
+{
+    // set gripper
+    std_msgs::Float32 angle;
+
+    // open fingers
+    angle.data = clawWristAngleData;
+    wristAnglePublish.publish(angle);
+    angle.data = 0;
+}
+
+//COS: Open claw/finger
+void sendClawCommand(float angleData)
+{
+    // set gripper
+    std_msgs::Float32 angle;
+
+    // open fingers
+    angle.data = angleData;
+
+    fingerAnglePublish.publish(angle);
+    angle.data = 0;
+}
+
 
 void sendDriveCommand(double linearVel, double angularError)
 {
@@ -522,6 +610,13 @@ void sendDriveCommand(double linearVel, double angularError)
  *************************/
 
 void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& message) {
+
+    // Cos: Target
+    if(message->detections.size()>0){
+        cosTargetDetected = true;
+    }else{
+        cosTargetDetected = false;
+    };
 
     // If in manual mode do not try to automatically pick up the target
     if (currentMode == 1 || currentMode == 0) return;
@@ -620,6 +715,7 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
 }
 
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
+    cosObstacleInt = message->data;
     if ((!targetDetected || targetCollected) && (message->data > 0)) {
         // obstacle on right side
         if (message->data == 1) {
