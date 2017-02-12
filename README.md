@@ -8,6 +8,8 @@ Weekly activity log:
 
 2. Linux install issues, learning linux commands, running Rover Interface and studying given code (mobility.cpp).
 
-3. **CURRENT TASK**: Programmatically move rovers, detect targets, and pick them up.
+3. Understand ROS. Programmatically move rovers, detect targets, and pick them up.
+
+3. **CURRENT TASK**: Implement some basic search algorithm other than the one provided.
 
 ---
