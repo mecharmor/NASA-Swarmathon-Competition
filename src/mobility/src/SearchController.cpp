@@ -11,22 +11,19 @@ SearchController::SearchController() {
 geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLocation) {
   geometry_msgs::Pose2D goalLocation;
 
-  ROS_INFO_STREAM("COS Info Stream: rng: ");
-
   //select new heading from Gaussian distribution around current heading
   //goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
-   goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
+  goalLocation.theta = currentLocation.theta+1;
 
-   ROS_INFO_STREAM("COS Info Stream: Goal Location "<< goalLocation.theta);
-
+  ROS_INFO_STREAM("COS: Cur Loc x: "<< currentLocation.x);
+  ROS_INFO_STREAM("COS: Cur Loc y: "<< currentLocation.y);
 
   //select new position 50 cm from current location
   //goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
-//  goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
+//goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
 
-goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
-goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
-
+  goalLocation.x = 3;
+  goalLocation.y = 3;
 
   return goalLocation;
 }

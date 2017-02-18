@@ -1,5 +1,4 @@
 #include <ros/ros.h>
-#include <math.h>
 
 // ROS libraries
 #include <angles/angles.h>
@@ -47,8 +46,6 @@ void closeFingers();// Close fingers to 0 degrees
 void raiseWrist();  // Return wrist back to 0 degrees
 void lowerWrist();  // Lower wrist to 50 degrees
 void mapAverage();  // constantly averages last 100 positions from map
-
-geometry_msgs::Pose2D prevLocation;
 
 // Numeric Variables for rover positioning
 geometry_msgs::Pose2D currentLocation;
@@ -100,7 +97,7 @@ geometry_msgs::Pose2D mapLocation[mapHistorySize];
 
 bool avoidingObstacle = false;
 
-float searchVelocity = 0.2; // meters/second
+float searchVelocity = 0.5; // 0.2 default meters/second
 
 std_msgs::String msg;
 
@@ -111,14 +108,7 @@ std_msgs::String msg;
 #define STATE_MACHINE_PICKUP 3
 #define STATE_MACHINE_DROPOFF 4
 
-// Visalia state machine
-#define STATE_MACHINE_INIT  0
-#define STATE_MACHINE_MOVE  1
-#define STATE_MACHINE_ROTATE_2 2
-
-#define PI 3.14159
-
-int stateMachineState = STATE_MACHINE_INIT;
+int stateMachineState = STATE_MACHINE_TRANSFORM;
 
 geometry_msgs::Twist velocity;
 char host[128];
@@ -141,8 +131,6 @@ ros::Subscriber obstacleSubscriber;
 ros::Subscriber odometrySubscriber;
 ros::Subscriber mapSubscriber;
 
-//Visalia AI variables
-int COS_Obstacle = 0;
 
 // Timers
 ros::Timer stateMachineTimer;
@@ -173,8 +161,6 @@ void mapHandler(const nav_msgs::Odometry::ConstPtr& message);
 void mobilityStateMachine(const ros::TimerEvent&);
 void publishStatusTimerEventHandler(const ros::TimerEvent& event);
 void targetDetectedReset(const ros::TimerEvent& event);
-
-void temp_sendDriveCommand(double, double);
 
 int main(int argc, char **argv) {
 
@@ -284,7 +270,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 centerLocationMap.x = currentLocationAverage.x;
                 centerLocationMap.y = currentLocationAverage.y;
                 centerLocationMap.theta = currentLocationAverage.theta;
-                stateMachineState=  STATE_MACHINE_INIT;
 
                 // initialization has run
                 init = true;
@@ -310,78 +295,12 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             wristAnglePublish.publish(angle);
         }
 
-        switch(stateMachineState)   {
-            case STATE_MACHINE_INIT:    {
-                    goalLocation.x= 1;
-                    goalLocation.y= 0;
-                    prevLocation.x= currentLocation.x;
-                    prevLocation.y= currentLocation.y;
-                    stateMachineState=  STATE_MACHINE_MOVE;
-                    ROS_INFO_STREAM("Curr Theta: "<< currentLocation.theta);
-                    ROS_INFO_STREAM("atan: "<< atan2(centerLocation.y-currentLocation.y, centerLocation.x-currentLocation.x) );
-                    ROS_INFO_STREAM("center y :" << centerLocation.y);
-                    ROS_INFO_STREAM("center x :" << centerLocation.x);
-                    ROS_INFO_STREAM("cur y :" << currentLocation.y);
-                    ROS_INFO_STREAM("cur x :" << currentLocation.x);
-                    ROS_INFO_STREAM("centery-cury :" << centerLocation.y - currentLocation.y);
-                    ROS_INFO_STREAM("centerx-curx :" << centerLocation.x - currentLocation.x);
-                break;
-            }
-            case STATE_MACHINE_MOVE:    {
-                    if(COS_Obstacle> 0) {
-                        /*sendDriveCommand(0, 0);
-                        goalLocation.x= centerLocation.x-currentLocation.x;
-                        goalLocation.y= centerLocation.y-currentLocation.y;
-                        stateMachineState= STATE_MACHINE_ROTATE_2;
-                        */
-                        stateMachineState= STATE_MACHINE_ROTATE_2;
-                    }
-                    else    {
-                        prevLocation.x= currentLocation.x;
-                        prevLocation.y= currentLocation.y;
-                        sendDriveCommand(-2, 0);
-
-                    ROS_INFO_STREAM("cur y :" << currentLocation.y);
-                    ROS_INFO_STREAM("cur x :" << currentLocation.x);
-                    }
-                break;
-            }
-            case STATE_MACHINE_ROTATE_2: {
-                
-                //atan2(centerLocation.y - currentLocation.y, centerLocation.x - currentLocation.x);
-                double atanValue =  atan2(centerLocation.y - currentLocation.y, centerLocation.x - currentLocation.x);
-                ROS_INFO_STREAM("centery-cury :" << centerLocation.y - currentLocation.y);
-                ROS_INFO_STREAM("centerx-curx :" << centerLocation.x - currentLocation.x);
-                //ROS_INFO_STREAM("atan2 is: " << atanValue);
-                //ROS_INFO_STREAM("Current Theta: " << currentLocation.theta);
-                //ROS_INFO_STREAM("CENTER: X="<< centerLocation.x<< ", Y="<< centerLocation.y);
-                //ROS_INFO_STREAM("CURR: X="<< currentLocation.x<< ", Y="<< currentLocation.y);
-                //ROS_INFO_STREAM("GOAL: X="<< goalLocation.x<< ", Y="<< goalLocation.y);
-                
-                if ( currentLocation.theta <= abs(atanValue))
-                {
-                    sendDriveCommand(0, 0.1);
-                }
-                else
-                {
-                    sendDriveCommand(2, 0);
-                    stateMachineState= STATE_MACHINE_MOVE;
-                }
-                
-                //sendDriveCommand(0, atanValue);
-                //if(currentLocation.theta>= prevLocation.theta-0.25 && currentLocation.theta<= prevLocation.theta+0.25)
-                
-                break;
-            }
-        }
-
         // Select rotation or translation based on required adjustment
-        /*switch(stateMachineState) {
+        switch(stateMachineState) {
 
         // If no adjustment needed, select new goal
         case STATE_MACHINE_TRANSFORM: {
             stateMachineMsg.data = "TRANSFORMING";
-            ROS_INFO_STREAM("COS Obstacle: " << COS_Obstacle);
 
             // If returning with a target
             if (targetCollected && !avoidingObstacle) {
@@ -448,7 +367,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             //Otherwise, drop off target and select new random uniform heading
             //If no targets have been detected, assign a new goal
             else if (!targetDetected && timerTimeElapsed > returnToSearchDelay) {
-                //ROS_INFO_STREAM("To Space!!!!");
                 goalLocation = searchController.search(currentLocation);
             }
 
@@ -467,9 +385,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             // If angle > 0.4 radians rotate but dont drive forward.
             if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > rotateOnlyAngleTolerance) {
                 // rotate but dont drive  0.05 is to prevent turning in reverse
-                //sendDriveCommand(0.05, errorYaw);
-
-                //(x, y) : x = speed of forward y = rotation angle
                 sendDriveCommand(0.05, errorYaw);
                 break;
             } else {
@@ -491,17 +406,11 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             // goal not yet reached drive while maintaining proper heading.
             if (fabs(angles::shortest_angular_distance(currentLocation.theta, atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x))) < M_PI_2) {
                 // drive and turn simultaniously
-                //sendDriveCommand(searchVelocity, errorYaw/2.0);
-
-                //(x, y) : x = speed of forward (in meters) y = rotation angle / 2
-                sendDriveCommand(searchVelocity, errorYaw/2.0);
+                sendDriveCommand(searchVelocity, errorYaw/2);
             }
             // goal is reached but desired heading is still wrong turn only
             else if (fabs(angles::shortest_angular_distance(currentLocation.theta, goalLocation.theta)) > 0.1) {
                  // rotate but dont drive
-                //sendDriveCommand(0.0, errorYaw);
-
-                //(x, y) : x = speed of forward y = rotation angle
                 sendDriveCommand(0.0, errorYaw);
             }
             else {
@@ -585,7 +494,6 @@ void mobilityStateMachine(const ros::TimerEvent&) {
         }
 
         } /* end of switch() */
-        
     }
     // mode is NOT auto
     else {
@@ -606,12 +514,6 @@ void sendDriveCommand(double linearVel, double angularError)
     velocity.angular.z = angularError;
 
     // publish the drive commands
-    driveControlPublish.publish(velocity);
-}
-
-void temp_sendDriveCommand(double linearX, double linearY)    {
-    velocity.linear.x=  linearX;
-    velocity.linear.y=  linearY;
     driveControlPublish.publish(velocity);
 }
 
@@ -715,20 +617,14 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
 void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
     currentMode = message->data;
     sendDriveCommand(0.0, 0.0);
-
 }
 
-
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
-    COS_Obstacle = message->data;
-    if  (COS_Obstacle > 0)
-        ROS_INFO_STREAM("Obstacle Found!!!! : "<< COS_Obstacle);
     if ((!targetDetected || targetCollected) && (message->data > 0)) {
         // obstacle on right side
         if (message->data == 1) {
             // select new heading 0.2 radians to the left
             goalLocation.theta = currentLocation.theta + 0.6;
-
         }
 
         // obstacle in front or on left side
@@ -741,7 +637,7 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
         goalLocation = searchController.continueInterruptedSearch(currentLocation, goalLocation);
 
         // switch to transform state to trigger collision avoidance
-        //stateMachineState = STATE_MACHINE_ROTATE;
+        stateMachineState = STATE_MACHINE_ROTATE;
 
         avoidingObstacle = true;
     }
