@@ -23,6 +23,7 @@ class SearchController {
   private:
 
     random_numbers::RandomNumberGenerator* rng;
+
 };
 
 #endif /* SEARCH_CONTROLLER */

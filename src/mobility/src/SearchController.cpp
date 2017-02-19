@@ -1,6 +1,9 @@
 #include "SearchController.h"
 #include <ros/ros.h>
 
+// ROS libraries
+#include <angles/angles.h>
+
 SearchController::SearchController() {
   rng = new random_numbers::RandomNumberGenerator();
 }
@@ -9,21 +12,28 @@ SearchController::SearchController() {
  * This code implements a basic random walk search.
  */
 geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLocation) {
+
   geometry_msgs::Pose2D goalLocation;
-
-  //select new heading from Gaussian distribution around current heading
-  //goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
-  goalLocation.theta = currentLocation.theta+1;
-
-  ROS_INFO_STREAM("COS: Cur Loc x: "<< currentLocation.x);
-  ROS_INFO_STREAM("COS: Cur Loc y: "<< currentLocation.y);
 
   //select new position 50 cm from current location
   //goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
-//goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
+  //goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
 
-  goalLocation.x = 3;
-  goalLocation.y = 3;
+  goalLocation.x = -4;
+  goalLocation.y = -4;
+
+  ROS_INFO_STREAM("COS: Cur Loc x: "<< currentLocation.x);
+  ROS_INFO_STREAM("COS: Cur Loc y: "<< currentLocation.y);
+  ROS_INFO_STREAM("COS: Cur Loc theta : "<< currentLocation.theta);
+
+
+  //select new heading from Gaussian distribution around current heading
+  //goalLocation.theta = rng->gaussian(currentLocation.theta, 0.25);
+
+  double myHeading = atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x);
+  goalLocation.theta = myHeading;
+
+  ROS_INFO_STREAM("COS: aTan2 : "<< myHeading);
 
   return goalLocation;
 }
