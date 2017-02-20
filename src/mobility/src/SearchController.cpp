@@ -1,5 +1,6 @@
 #include "SearchController.h"
 #include <ros/ros.h>
+#include <string>
 
 // ROS libraries
 #include <angles/angles.h>
@@ -11,16 +12,31 @@ SearchController::SearchController() {
 /**
  * This code implements a basic random walk search.
  */
-geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLocation) {
+geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLocation, std::string publishedName) {
+  double n=0.0;
+  double m=0.0;
+
+  ROS_INFO_STREAM("COS: published name: "<<publishedName);
 
   geometry_msgs::Pose2D goalLocation;
 
   //select new position 50 cm from current location
   //goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
   //goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
-
-  goalLocation.x = -4;
-  goalLocation.y = -4;
+  if(publishedName=="achilles"){ //black rover
+    n=-5.0;
+    m=-1.0;
+  }
+  if(publishedName=="aeneas"){ //yellow rover
+    n=5.0;
+    m=-1.0;
+  }
+  if(publishedName=="ajax"){ //white rover
+    n=-1.0;
+    m=-5.0;
+  }
+  goalLocation.x = n;
+  goalLocation.y = m;
 
   ROS_INFO_STREAM("COS: Cur Loc x: "<< currentLocation.x);
   ROS_INFO_STREAM("COS: Cur Loc y: "<< currentLocation.y);
