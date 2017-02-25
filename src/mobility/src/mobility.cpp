@@ -97,7 +97,7 @@ geometry_msgs::Pose2D mapLocation[mapHistorySize];
 
 bool avoidingObstacle = false;
 
-float searchVelocity = 0.5; // 0.2 default meters/second
+float searchVelocity = 0.2; // 0.2 default meters/second
 
 std_msgs::String msg;
 

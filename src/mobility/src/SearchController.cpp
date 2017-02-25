@@ -7,6 +7,9 @@
 
 SearchController::SearchController() {
   rng = new random_numbers::RandomNumberGenerator();
+  isInitiated=  false;
+  currIndex=  0;
+  deg=  0;
 }
 
 /**
@@ -16,7 +19,7 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
   double n=0.0;
   double m=0.0;
 
-  ROS_INFO_STREAM("COS: published name: "<<publishedName);
+  //ROS_INFO_STREAM("COS: published name: "<<publishedName);
 
   geometry_msgs::Pose2D goalLocation;
 
@@ -24,8 +27,45 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
   //goalLocation.x = currentLocation.x + (0.5 * cos(goalLocation.theta));
   //goalLocation.y = currentLocation.y + (0.5 * sin(goalLocation.theta));
   if(publishedName=="achilles"){ //black rover
-    n=-5.0;
-    m=-1.0;
+    if(!isInitiated)  {
+      for(int i= 0; i< GOAL_SIZE; i++)  {
+        goals[i]= Pos2D();
+        goals[i].x= ((i<= 12) ? -6 : i-20);
+        goals[i].y= ((i<= 12) ? i-6 : 5);
+      }
+      
+      // Spiral algorithm
+      //deg=  135;
+
+      isInitiated=  true;
+    }
+    // Spiral algorithm
+    /*
+    n=  cos(deg*CONVERT_TO_RADS);
+    m=  sin(deg*CONVERT_TO_RADS);
+    ROS_INFO_STREAM("DERPALERP "<< deg);
+    deg=  (deg+15)%360;
+    */
+    
+    n=  goals[currIndex].x;
+    m=  goals[currIndex].y;
+    if(
+      currentLocation.x>= n-EPSILON_SEARCH_RAD && currentLocation.x<= n+EPSILON_SEARCH_RAD &&
+      currentLocation.y>= m-EPSILON_SEARCH_RAD && currentLocation.y<= m+EPSILON_SEARCH_RAD
+    )  {
+      currIndex++;
+      currIndex%= GOAL_SIZE;
+    }
+    ROS_INFO_STREAM("Zachattack "<< currIndex);
+    
+    /*
+    if(currentLocation.x > -6.0 && currentLocation.x < -4.0 && currentLocation.y < -1.0 && currentLocation.y > -2.0){
+      n = 0.0;
+      m = 0.0;
+    }else{
+      n=-5.0;
+      m=-1.0;
+    }*/
   }
   if(publishedName=="aeneas"){ //yellow rover
     n=5.0;
@@ -38,9 +78,9 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
   goalLocation.x = n;
   goalLocation.y = m;
 
-  ROS_INFO_STREAM("COS: Cur Loc x: "<< currentLocation.x);
-  ROS_INFO_STREAM("COS: Cur Loc y: "<< currentLocation.y);
-  ROS_INFO_STREAM("COS: Cur Loc theta : "<< currentLocation.theta);
+  //ROS_INFO_STREAM("COS: Cur Loc x: "<< currentLocation.x);
+  //ROS_INFO_STREAM("COS: Cur Loc y: "<< currentLocation.y);
+  //ROS_INFO_STREAM("COS: Cur Loc theta : "<< currentLocation.theta);
 
 
   //select new heading from Gaussian distribution around current heading
@@ -49,7 +89,7 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
   double myHeading = atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x);
   goalLocation.theta = myHeading;
 
-  ROS_INFO_STREAM("COS: aTan2 : "<< myHeading);
+ // ROS_INFO_STREAM("COS: aTan2 : "<< myHeading);
 
   return goalLocation;
 }
