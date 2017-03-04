@@ -24,9 +24,17 @@ class SearchController {
 
     SearchController();
 
+    // Makes a path that spirals in a cubed fashion
+    void cubedSpiralAlgorithm(float cx, float cy, float r, geometry_msgs::Pose2D currentLocation);
+
+    //return an x that matches the grid for all rovers
+    float getX(float x);
+    float getY(float y);
+
     // performs search pattern
     //geometry_msgs::Pose2D search(geometry_msgs::Pose2D currentLocation);
     geometry_msgs::Pose2D search(geometry_msgs::Pose2D currentLocation, std::string publishedName);
+
 
     // continues search pattern after interruption
     geometry_msgs::Pose2D continueInterruptedSearch(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D oldGoalLocation);
@@ -34,7 +42,7 @@ class SearchController {
   private:
 
     random_numbers::RandomNumberGenerator* rng;
-    // Array goal search algorithm
+    //The Cornerstone Algorithm (Array goal Corner sweep search algorithm)
     Pos2D goals[GOAL_SIZE];
     bool  isInitiated;
     int currIndex;
