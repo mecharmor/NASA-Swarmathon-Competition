@@ -27,6 +27,10 @@ class SearchController {
     // Makes a path that spirals in a cubed fashion
     void cubedSpiralAlgorithm(float cx, float cy, float r, geometry_msgs::Pose2D currentLocation);
 
+    // Obtain the next waypoint in goals array
+    // using board coordinates
+    Pos2D nextGoal(std::string publishedName,geometry_msgs::Pose2D currentLocation);
+
     //return an x that matches the grid for all rovers
     float getX(float x);
     float getY(float y);
@@ -48,6 +52,7 @@ class SearchController {
     int currIndex;
     // Sprial search algorithm
     int deg; // Degrees
+    std::string name;
 };
 
 #endif /* SEARCH_CONTROLLER */
