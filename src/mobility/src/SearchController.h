@@ -5,9 +5,10 @@
 #include <random_numbers/random_numbers.h>
 #include <string>
 
-#define GOAL_SIZE 20
+#define GOAL_SIZE 100
 #define EPSILON_SEARCH_RAD 1
-#define CONVERT_TO_RADS (3.14159/180)
+#define TO_RADS (3.14159/180)
+#define PI 3.14159f
 
 /**
  * This class implements the search control algorithm for the rovers. The code
@@ -29,7 +30,7 @@ class SearchController {
 
     // Obtain the next waypoint in goals array
     // using board coordinates
-    Pos2D nextGoal(std::string publishedName,geometry_msgs::Pose2D currentLocation);
+    Pos2D nextGoal(geometry_msgs::Pose2D currentLocation);
 
     //return an x that matches the grid for all rovers
     float getX(float x);
@@ -50,8 +51,6 @@ class SearchController {
     Pos2D goals[GOAL_SIZE];
     bool  isInitiated;
     int currIndex;
-    // Sprial search algorithm
-    int deg; // Degrees
     std::string name;
 };
 

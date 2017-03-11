@@ -425,6 +425,7 @@ void mobilityStateMachine(const ros::TimerEvent&) {
 
                 // move back to transform step
                 stateMachineState = STATE_MACHINE_TRANSFORM;
+          
             }
 
             break;
@@ -568,7 +569,7 @@ void targetHandler(const apriltags_ros::AprilTagDetectionArray::ConstPtr& messag
         // if we see the center and we dont have a target collected
         if (centerSeen && !targetCollected) {
 
-            float centeringTurn = 0.15; //radians
+            float centeringTurn = 0.157079f; //radians
             stateMachineState = STATE_MACHINE_TRANSFORM;
 
             // this code keeps the robot from driving over
@@ -626,6 +627,11 @@ void modeHandler(const std_msgs::UInt8::ConstPtr& message) {
 
 void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
     if ((!targetDetected || targetCollected) && (message->data > 0)) {
+
+        // If the center is seen
+        if(!centerSeen) {
+
+        }
         // obstacle on right side
         if (message->data == 1) {
             // select new heading 0.2 radians to the left
