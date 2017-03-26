@@ -5,6 +5,11 @@
 
 // ROS libraries
 #include <angles/angles.h>
+#include <std_msgs/Float32.h>
+#include <std_msgs/Int16.h>
+#include <std_msgs/UInt8.h>
+#include <std_msgs/String.h>
+
 
 float clamp(float val, float min, float max);
 bool isOutOfBounds(float x, float y);
@@ -24,6 +29,7 @@ bool isOutOfBounds(float x, float y)  {
   
   return false;
 }
+
 
 SearchController::SearchController() {
   //default constructor
@@ -45,19 +51,59 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
   if(!isInitiated)  {
     isInitiated=  true;
     name = publishedName;
+
     if(publishedName=="achilles"){ //black rover
-      /*
+      
       // set waypoints with respect to the board origin
-      // hopefully programmitically and in the constructor!
-      goals[0].x= -1.0f;
+      // rough start to try to avoid other rovers at start
+      goals[0].x= 0.0f;
       goals[0].y= 0.0f;
-      goals[1].x= -1.0f;
-      goals[1].y= -1.0f;
+      goals[1].x= -2.0f;
+      goals[1].y= 1.0f;
+ 
+      for(int i= 2; i< GOAL_SIZE; i++) {
+        if(i%2==0){
+          goals[i].x = -0.7071*(i*0.8f);
+          goals[i].y = -0.7071*(i*0.8f);
+        }else{
+          goals[i].x = 0.0f;
+          goals[i].y = i*0.8f;
+        }
+
+      }
+
+
+
+
+ /*
+      //then pattern kicks in
       goals[2].x= -2.0f;
-      goals[2].y= -1.0f;
-      goals[3].x= -2.0f;
-      goals[3].y= 0.0f;
-      */
+      goals[2].y= 0.0f;
+      goals[3].x= -1.0f;
+      goals[3].y= 1.0f;
+      goals[4].x= 0.0f;
+      goals[4].y= 2.0f;
+
+      goals[5].x= 0.0f;
+      goals[5].y= 3.0f;
+      goals[6].x= -1.0f;
+      goals[6].y= 2.0f;
+      goals[7].x= -2.0f;
+      goals[7].y= 1.0f;
+      goals[8].x= -3.0f;
+      goals[8].y= 0.0f;
+
+      goals[9].x= -4.0f;
+      goals[9].y= 0.0f;
+      goals[10].x= -3.0f;
+      goals[10].y= 1.0f;
+      goals[11].x= -2.0f;
+      goals[11].y= 2.0f;
+      goals[12].x= -1.0f;
+      goals[12].y= 3.0f;
+      goals[13].x= 0.0f;
+      goals[13].y= 4.0f;
+     
       float r=  1.0f;
       int s=  1.0f;
       for(int i= 0; i< GOAL_SIZE; i++)  {
@@ -77,10 +123,56 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
           goals[i].y= clamp(goals[i].y, -6.0f, 6.0f);
 
       }
+      */
 
     }
     else if(publishedName=="aeneas"){ //yellow rover
-      /*
+          // rough start
+      goals[0].x= 0.0f;
+      goals[0].y= 0.0f;
+      goals[1].x= 2.0f;
+      goals[1].y= 2.0f;
+      for(int i= 2; i< GOAL_SIZE; i++) {
+        if(i%2==1){
+          goals[i].x= 0.5f;  //i is used for the radius (offset to avoid edge)
+          goals[i].y= i*0.8f;
+        }else{
+          goals[i].x= i*0.8f;  //i is used for the radius
+          goals[i].y= 0.5f; // offset to avoid edge collisions
+        }
+
+
+      }
+
+/*
+      //then pattern kicks in
+      goals[3].x= 3.0f;
+      goals[3].y= 1.0f;
+      goals[4].x= 2.0f;
+      goals[4].y= 2.0f;
+      goals[5].x= 1.0f;
+      goals[5].y= 3.0f;
+
+      goals[6].x= 1.0f;
+      goals[6].y= 4.0f;
+      goals[7].x= 2.0f;
+      goals[7].y= 3.0f;
+      goals[8].x= 3.0f;
+      goals[8].y= 2.0f;
+      goals[9].x= 4.0f;
+      goals[9].y= 1.0f;
+
+      goals[10].x= 5.0f;
+      goals[10].y= 1.0f;
+      goals[11].x= 4.0f;
+      goals[11].y= 2.0f;
+      goals[12].x= 3.0f;
+      goals[12].y= 3.0f;
+      goals[13].x= 2.0f;
+      goals[13].y= 4.0f;
+      goals[14].x= 1.0f;
+      goals[14].y= 5.0f;
+      
       // goal locations using board coordinates
       goals[0].x = 3.0f;
       goals[0].y = 1.0f;
@@ -88,7 +180,7 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
       goals[1].y = 3.0f;
       goals[2].x = 1.0f;
       goals[2].y = 1.0f;
-      */
+      
       float r=  1.0f;
       int  s= 1;
       for(int i= 0; i< GOAL_SIZE; i++)  {
@@ -106,17 +198,34 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
           goals[i].x= clamp(goals[i].x, -6.0f, 6.0f);
           goals[i].y= clamp(goals[i].y, -6.0f, 6.0f);
       }
+      */
     }
     else if(publishedName=="ajax"){ //white rover
+      goals[0].x = 0.0f;
+      goals[0].y = 0.0f;
+      goals[1].x = 1.0f;
+      goals[1].y = 0.0f;
+      goals[2].x = 1.0f;
+      goals[2].y = -1.0f;
+      for(int i= 3; i< GOAL_SIZE; i++) {
+        if(i%2==1){
+          goals[i].x = -0.7071*(i*0.5f);
+          goals[i].y = -0.7071*(i*0.5f);
+        }else{
+          goals[i].x= i*0.8f;  //i is used for the radius
+          goals[i].y= -0.3f;  // to avoid edge collisions
+        }
+
+
+      }
       /*
       // waypoints for ajax
-      goals[0].x = 1.0f;
-      goals[0].y = -3.0f;
+
       goals[1].x = -3.0f;
       goals[1].y = -3.0f;
       goals[2].x = 0.0f;
       goals[2].y = -1.0f;
-      */
+      
       float r=  1.0f;
       int   s=  1;
       for(int i= 0; i< GOAL_SIZE; i++)  {
@@ -134,7 +243,13 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
           goals[i].x= clamp(goals[i].x, -6.0f, 6.0f);
           goals[i].y= clamp(goals[i].y, -6.0f, 6.0f);
       }
+    */
+
     }
+  }else{
+    //is initialized
+    //ROS_INFO_STREAM("Which Rover Search Called "<<name);
+
   }
 
   // goal location should be relative to board coordinates
@@ -201,13 +316,13 @@ Pos2D SearchController::nextGoal(geometry_msgs::Pose2D currentLocation){
     isInitiated=  true;
   }else*/{
     _distance = sqrt(pow(currentLocation.x-goals[currIndex].x,2.0)+pow(currentLocation.y-goals[currIndex].y,2.0));
-    ROS_INFO_STREAM("COS: published name: "<<name<<" distance "<<_distance << " to "<< currIndex);
+    //ROS_INFO_STREAM("COS: published name: "<<name<<" distance "<<_distance << " to "<< currIndex);
 
     // go to next waypoint when goal is reached
     if(_distance<1.5){
       currIndex++;
       currIndex = currIndex%GOAL_SIZE;
-      ROS_INFO_STREAM("NEW WAYPOINT "<<currIndex << " for "<< name);
+      //ROS_INFO_STREAM("NEW WAYPOINT "<<currIndex << " for "<< name);
       goal.x=goals[currIndex].x;
       goal.y=goals[currIndex].y;
     }

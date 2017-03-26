@@ -250,8 +250,8 @@ int main(int argc, char **argv) {
 void mobilityStateMachine(const ros::TimerEvent&) {
 
     std_msgs::String stateMachineMsg;
-    float rotateOnlyAngleTolerance = 0.4;
-    int returnToSearchDelay = 5;
+    float rotateOnlyAngleTolerance = 0.5; //COS was 0.4
+    int returnToSearchDelay = 4;  //COS was 5
 
     // calls the averaging function, also responsible for
     // transform from Map frame to odom frame.
@@ -309,6 +309,20 @@ void mobilityStateMachine(const ros::TimerEvent&) {
             if (targetCollected && !avoidingObstacle) {
                 // calculate the euclidean distance between
                 // centerLocation and currentLocation
+                //COS adjustments to world coordinates
+                    if(publishedName=="achilles"){ //black rover
+                        // This rover starts at (0,1) so subtract 1 from goalLocation.y 
+                        centerLocation.y-=1.0;
+                    }
+                    if(publishedName=="aeneas"){ //yellow rover
+                        // This rover starts at (1,1) so subtract 1 from goalLocation.y and x
+                        centerLocation.x-=1.0;
+                        centerLocation.y-=1.0;
+                    }
+                    if(publishedName=="ajax"){ //white rover
+                        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+                        centerLocation.x-=1.0;
+                    }
                 dropOffController.setCenterDist(hypot(centerLocation.x - currentLocation.x, centerLocation.y - currentLocation.y));
                 dropOffController.setDataLocations(centerLocation, currentLocation, timerTimeElapsed);
 
@@ -469,15 +483,40 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     result.pickedUp = false;
                     stateMachineState = STATE_MACHINE_ROTATE;
 
-                    goalLocation.theta = atan2(centerLocationOdom.y - currentLocation.y, centerLocationOdom.x - currentLocation.x);
+                    ROS_INFO_STREAM("PICKED UP "<<publishedName);
+                    ROS_INFO_STREAM("Pos "<<publishedName<<" CentODOMx "<<centerLocationOdom.x);
+                    ROS_INFO_STREAM("Pos "<<publishedName<<" CentODOMy "<<centerLocationOdom.y);
+
+                    //goalLocation.theta = atan2(centerLocationOdom.y - currentLocation.y, centerLocationOdom.x - currentLocation.x);
 
                     // set center as goal position
-                    goalLocation.x = centerLocationOdom.x = 0;
-                    goalLocation.y = centerLocationOdom.y;
+                    goalLocation.x = 0;
+                    goalLocation.y = 0;
+                    //goalLocation.x = centerLocationOdom.x;
+                    //goalLocation.y = centerLocationOdom.y;
+
+                    //COS adjustments to world coordinates
+                    if(publishedName=="achilles"){ //black rover
+                        // This rover starts at (0,1) so subtract 1 from goalLocation.y 
+                        goalLocation.y-=1.0;
+                    }
+                    if(publishedName=="aeneas"){ //yellow rover
+                        // This rover starts at (1,1) so subtract 1 from goalLocation.y and x
+                        goalLocation.x-=1.0;
+                        goalLocation.y-=1.0;
+                    }
+                    if(publishedName=="ajax"){ //white rover
+                        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+                        goalLocation.x-=1.0;
+                    }
+
+                    goalLocation.theta = atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x);
+
+                    
 
                     // lower wrist to avoid ultrasound sensors
                     std_msgs::Float32 angle;
-                    angle.data = 0.8;
+                    angle.data = 0.6;  // COS lowered a bit more was .8
                     wristAnglePublish.publish(angle);
                     sendDriveCommand(0.0,0);
 
@@ -630,23 +669,27 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
 
         // If the center is seen
         if(!centerSeen) {
-
+            
         }
         // obstacle on right side
         if (message->data == 1) {
             // select new heading 0.2 radians to the left
-            goalLocation.theta = currentLocation.theta + 0.6;
+            goalLocation.theta = currentLocation.theta + 0.2;
+            
         }
 
         // obstacle in front or on left side
         else if (message->data == 2) {
             // select new heading 0.2 radians to the right
-            goalLocation.theta = currentLocation.theta + 0.6;
+            goalLocation.theta = currentLocation.theta + 0.2;
         }
 
-        // continues an interrupted search
-        goalLocation = searchController.continueInterruptedSearch(currentLocation, goalLocation);
-
+        // continues an interrupted search 
+        //COS: only if !targetCollected
+        if(!targetCollected){
+                goalLocation = searchController.continueInterruptedSearch(currentLocation, goalLocation);
+        }
+        
         // switch to transform state to trigger collision avoidance
         stateMachineState = STATE_MACHINE_ROTATE;
 

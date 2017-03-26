@@ -10,6 +10,8 @@
 #define TO_RADS (3.14159/180)
 #define PI 3.14159f
 
+
+
 /**
  * This class implements the search control algorithm for the rovers. The code
  * here should be modified and enhanced to improve search performance.
@@ -51,7 +53,9 @@ class SearchController {
     Pos2D goals[GOAL_SIZE];
     bool  isInitiated;
     int currIndex;
-    std::string name;
+    std::string name;   
+    
+
 };
 
 #endif /* SEARCH_CONTROLLER */
