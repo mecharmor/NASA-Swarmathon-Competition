@@ -10,6 +10,8 @@ Weekly activity log:
 
 3. Understand ROS. Programmatically move rovers, detect targets, and pick them up.
 
-3. **CURRENT TASK**: Implement some basic search algorithm other than the one provided.
+4. Implemented and testes some algorithms with 3 rovers (10 min test)
+
+5. **CURRENT TASK**: Finish up reports for submission.
 
 ---
