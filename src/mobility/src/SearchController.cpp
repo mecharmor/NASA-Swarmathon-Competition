@@ -60,7 +60,42 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
       goals[0].y= 0.0f;
       goals[1].x= -2.0f;
       goals[1].y= 1.0f;
+
+      float r= 1.0f;
+      bool clockwise=true;
+      goals[2].x = r*cos(210*PI/180.0f);
+      goals[2].y = r*sin(210*PI/180.0f);
  
+       for(int i=3; i< GOAL_SIZE; i++) {
+        if(i%3==0){
+          r+=0.5f;
+          if(clockwise){
+            goals[i].x = r*cos(210*PI/180.0f);
+            goals[i].y = r*sin(210*PI/180.0f);
+          }else{
+            goals[i].x = 0.0f;
+            goals[i].y = r;
+          }
+        }else if(i%3==1){
+          goals[i].x = r*cos(150*PI/180.0f);
+          goals[i].y = r*sin(150*PI/180.0f);
+        }else{
+          if(clockwise){
+            goals[i].x = 0.0f;
+            goals[i].y = r;
+            clockwise=false;
+          }else{
+            goals[i].x = r*cos(210*PI/180.0f);
+            goals[i].y = r*sin(210*PI/180.0f);
+            clockwise=true;
+          }
+
+          
+        }
+
+      }
+
+ /*
       for(int i= 2; i< GOAL_SIZE; i++) {
         if(i%2==0){
           goals[i].x = -0.7071*(i*0.8f);
@@ -72,10 +107,6 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
 
       }
 
-
-
-
- /*
       //then pattern kicks in
       goals[2].x= -2.0f;
       goals[2].y= 0.0f;
@@ -130,8 +161,47 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
           // rough start
       goals[0].x= 0.0f;
       goals[0].y= 0.0f;
-      goals[1].x= 2.0f;
-      goals[1].y= 2.0f;
+      goals[1].x= 1.0f;
+      goals[1].y= 1.0f;
+
+      float r= 1.0f;
+      bool clockwise=true;
+      goals[2].x = 0.0f;
+      goals[2].y = r;
+ 
+       for(int i=3; i< GOAL_SIZE; i++) {
+        if(i%3==0){
+          r+=0.5f;
+          if(clockwise){
+            goals[i].x = 0.0f;
+            goals[i].y = r;
+          }else{
+            goals[i].x = r*cos(330*PI/180.0f);
+            goals[i].y = r*sin(330*PI/180.0f);
+          }
+        }else if(i%3==1){
+          goals[i].x = r*cos(30*PI/180.0f);
+          goals[i].y = r*sin(30*PI/180.0f);
+        }else{
+          if(clockwise){
+            goals[i].x = r*cos(330*PI/180.0f);
+            goals[i].y = r*sin(330*PI/180.0f);
+            clockwise=false;
+          }else{
+            goals[i].x = 0.0f;
+            goals[i].y = r;
+            clockwise=true;
+          }
+
+          
+        }
+
+      }    
+
+
+
+
+/*
       for(int i= 2; i< GOAL_SIZE; i++) {
         if(i%2==1){
           goals[i].x= 0.5f;  //i is used for the radius (offset to avoid edge)
@@ -144,7 +214,7 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
 
       }
 
-/*
+
       //then pattern kicks in
       goals[3].x= 3.0f;
       goals[3].y= 1.0f;
@@ -204,9 +274,49 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
       goals[0].x = 0.0f;
       goals[0].y = 0.0f;
       goals[1].x = 1.0f;
-      goals[1].y = 0.0f;
-      goals[2].x = 1.0f;
-      goals[2].y = -1.0f;
+      goals[1].y = -1.0f;
+
+
+      float r= 1.0f;
+      bool clockwise=true;
+      goals[2].x = r*cos(220*PI/180.0f);
+      goals[2].y = r*sin(220*PI/180.0f);
+ 
+       for(int i=3; i< GOAL_SIZE; i++) {
+        if(i%3==0){
+          r+=0.5f;
+          if(clockwise){
+            goals[i].x = r*cos(220*PI/180.0f);
+            goals[i].y = r*sin(220*PI/180.0f);
+          }else{
+            goals[i].x = r*cos(320*PI/180.0f);
+            goals[i].y = r*sin(320*PI/180.0f);
+          }
+        }else if(i%3==1){
+            goals[i].x = 0.0f;
+            goals[i].y = -1*r;
+        }else{
+          if(clockwise){
+            goals[i].x = r*cos(320*PI/180.0f);
+            goals[i].y = r*sin(320*PI/180.0f);
+            clockwise=false;
+          }else{
+            goals[i].x = r*cos(220*PI/180.0f);
+            goals[i].y = r*sin(220*PI/180.0f);
+            clockwise=true;
+          }
+
+          
+        }
+
+      }    
+
+
+
+
+
+
+      /*
       for(int i= 3; i< GOAL_SIZE; i++) {
         if(i%2==1){
           goals[i].x = -0.7071*(i*0.5f);
@@ -218,7 +328,7 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
 
 
       }
-      /*
+      
       // waypoints for ajax
 
       goals[1].x = -3.0f;
