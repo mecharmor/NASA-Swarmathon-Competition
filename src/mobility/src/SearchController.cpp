@@ -29,10 +29,27 @@ bool isOutOfBounds(float x, float y)  {
   
   return false;
 }
+Pos2D roverWorldCoordAdjust(Pos2D arg, std::string argName){
+  //takes rover coords and returns world coords
+  if(argName=="achilles"){ //black rover
+    // This rover starts at (0,1) so subtract 1 from goalLocation.y 
+    arg.y-=1.0;
+  }
+  if(argName=="aeneas"){ //yellow rover
+    // This rover starts at (1,1) so subtract 1 from goalLocation.y and x
+    arg.x-=1.0;
+    arg.y-=1.0;
+  }
+  if(argName=="ajax"){ //white rover
+    // This rover starts at (1,0) so subtract 1 from goalLocation.x
+    arg.x-=1.0;
+  }
 
+  return arg;
+}
 
+//constructor
 SearchController::SearchController() {
-  //default constructor
   rng = new random_numbers::RandomNumberGenerator();
 
   isInitiated=  false;
@@ -40,7 +57,8 @@ SearchController::SearchController() {
 }
 
 /**
- * This code implements a basic random walk search.
+ * This code implements COS HEX Sweep Search
+ * Search Method
  */
 geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLocation, std::string publishedName) {
   //Pos2D is a simple (x,y) stuct found in the header file
@@ -50,8 +68,11 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
 
   if(!isInitiated)  {
     isInitiated=  true;
+    // name is a property of the searchController and holds the rover name
+    // this will be passed into search method until we can learn ROS to get it.
     name = publishedName;
 
+    // Sets Waypoint array once
     if(publishedName=="achilles"){ //black rover
       
       // set waypoints with respect to the board origin
@@ -89,80 +110,21 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
             goals[i].y = r*sin(210*PI/180.0f);
             clockwise=true;
           }
-
-          
         }
+        //Max x value is: 7.5, Max y value is: 7.5
+        goals[i].x= clamp(goals[i].x, -6.0f, 6.0f);
+        goals[i].y= clamp(goals[i].y, -6.5f, 6.5f);
 
       }
-
- /*
-      for(int i= 2; i< GOAL_SIZE; i++) {
-        if(i%2==0){
-          goals[i].x = -0.7071*(i*0.8f);
-          goals[i].y = -0.7071*(i*0.8f);
-        }else{
-          goals[i].x = 0.0f;
-          goals[i].y = i*0.8f;
-        }
-
-      }
-
-      //then pattern kicks in
-      goals[2].x= -2.0f;
-      goals[2].y= 0.0f;
-      goals[3].x= -1.0f;
-      goals[3].y= 1.0f;
-      goals[4].x= 0.0f;
-      goals[4].y= 2.0f;
-
-      goals[5].x= 0.0f;
-      goals[5].y= 3.0f;
-      goals[6].x= -1.0f;
-      goals[6].y= 2.0f;
-      goals[7].x= -2.0f;
-      goals[7].y= 1.0f;
-      goals[8].x= -3.0f;
-      goals[8].y= 0.0f;
-
-      goals[9].x= -4.0f;
-      goals[9].y= 0.0f;
-      goals[10].x= -3.0f;
-      goals[10].y= 1.0f;
-      goals[11].x= -2.0f;
-      goals[11].y= 2.0f;
-      goals[12].x= -1.0f;
-      goals[12].y= 3.0f;
-      goals[13].x= 0.0f;
-      goals[13].y= 4.0f;
-     
-      float r=  1.0f;
-      int s=  1.0f;
-      for(int i= 0; i< GOAL_SIZE; i++)  {
-          goals[i].x= ((i/2)+1)*r*cos(((i%2== 0) ? PI/2.0f : 5.0f*PI/4.0f));
-          goals[i].y= ((i/2)+1)*r*sin(((i%2== 0) ? PI/2.0f : 5.0f*PI/4.0f));
-          if(isOutOfBounds(goals[i].x, goals[i].y)) {
-            if(i%2== 0) {
-              goals[i].x-=  s*r;
-            }
-            else  {
-              goals[i].y+=  s*r;
-              s++;
-            }
-          }
-          //Max x value is: 7.5, Max y value is: 7.5
-          goals[i].x= clamp(goals[i].x, -6.0f, 6.0f);
-          goals[i].y= clamp(goals[i].y, -6.0f, 6.0f);
-
-      }
-      */
 
     }
     else if(publishedName=="aeneas"){ //yellow rover
-          // rough start
+      
+      // rough start
       goals[0].x= 0.0f;
       goals[0].y= 0.0f;
-      goals[1].x= 1.0f;
-      goals[1].y= 1.0f;
+      goals[1].x= 2.0f;
+      goals[1].y= 2.0f;
 
       float r= 1.0f;
       bool clockwise=true;
@@ -195,86 +157,18 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
 
           
         }
+        //Max x value is: 7.5, Max y value is: 7.5
+        goals[i].x= clamp(goals[i].x, -6.0f, 6.0f);
+        goals[i].y= clamp(goals[i].y, -6.5f, 6.5f);
 
       }    
 
-
-
-
-/*
-      for(int i= 2; i< GOAL_SIZE; i++) {
-        if(i%2==1){
-          goals[i].x= 0.5f;  //i is used for the radius (offset to avoid edge)
-          goals[i].y= i*0.8f;
-        }else{
-          goals[i].x= i*0.8f;  //i is used for the radius
-          goals[i].y= 0.5f; // offset to avoid edge collisions
-        }
-
-
-      }
-
-
-      //then pattern kicks in
-      goals[3].x= 3.0f;
-      goals[3].y= 1.0f;
-      goals[4].x= 2.0f;
-      goals[4].y= 2.0f;
-      goals[5].x= 1.0f;
-      goals[5].y= 3.0f;
-
-      goals[6].x= 1.0f;
-      goals[6].y= 4.0f;
-      goals[7].x= 2.0f;
-      goals[7].y= 3.0f;
-      goals[8].x= 3.0f;
-      goals[8].y= 2.0f;
-      goals[9].x= 4.0f;
-      goals[9].y= 1.0f;
-
-      goals[10].x= 5.0f;
-      goals[10].y= 1.0f;
-      goals[11].x= 4.0f;
-      goals[11].y= 2.0f;
-      goals[12].x= 3.0f;
-      goals[12].y= 3.0f;
-      goals[13].x= 2.0f;
-      goals[13].y= 4.0f;
-      goals[14].x= 1.0f;
-      goals[14].y= 5.0f;
-      
-      // goal locations using board coordinates
-      goals[0].x = 3.0f;
-      goals[0].y = 1.0f;
-      goals[1].x = 3.0f;
-      goals[1].y = 3.0f;
-      goals[2].x = 1.0f;
-      goals[2].y = 1.0f;
-      
-      float r=  1.0f;
-      int  s= 1;
-      for(int i= 0; i< GOAL_SIZE; i++)  {
-          goals[i].x= ((i/2)+1)*r*cos(((i%2== 0) ? 7.0f*PI/4.0f : PI/2.0f));
-          goals[i].y= ((i/2)+1)*r*sin(((i%2== 0) ? 7.0f*PI/4.0f : PI/2.0f));
-          if(isOutOfBounds(goals[i].x, goals[i].y)) {
-            if(i%2== 0) {
-              goals[i].x+=  s*r;
-            }
-            else  {
-              goals[i].x-=  s*r;
-              s++;
-            }
-          }
-          goals[i].x= clamp(goals[i].x, -6.0f, 6.0f);
-          goals[i].y= clamp(goals[i].y, -6.0f, 6.0f);
-      }
-      */
     }
     else if(publishedName=="ajax"){ //white rover
       goals[0].x = 0.0f;
       goals[0].y = 0.0f;
       goals[1].x = 1.0f;
-      goals[1].y = -1.0f;
+      goals[1].y = -2.0f;
 
 
       float r= 1.0f;
@@ -308,52 +202,11 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
 
           
         }
+        //Max x value is: 7.5, Max y value is: 7.5
+        goals[i].x= clamp(goals[i].x, -6.0f, 6.0f);
+        goals[i].y= clamp(goals[i].y, -6.5f, 6.5f);
 
       }    
-
-
-
-
-
-
-      /*
-      for(int i= 3; i< GOAL_SIZE; i++) {
-        if(i%2==1){
-          goals[i].x = -0.7071*(i*0.5f);
-          goals[i].y = -0.7071*(i*0.5f);
-        }else{
-          goals[i].x= i*0.8f;  //i is used for the radius
-          goals[i].y= -0.3f;  // to avoid edge collisions
-        }
-
-
-      }
-      
-      // waypoints for ajax
-
-      goals[1].x = -3.0f;
-      goals[1].y = -3.0f;
-      goals[2].x = 0.0f;
-      goals[2].y = -1.0f;
-      
-      float r=  1.0f;
-      int   s=  1;
-      for(int i= 0; i< GOAL_SIZE; i++)  {
-          goals[i].x= ((i/2)+1)*r*cos(((i%2== 0) ? 5.0f*PI/4.0f : 7.0f*PI/4.0f));
-          goals[i].y= ((i/2)+1)*r*sin(((i%2== 0) ? 5.0f*PI/4.0f : 7.0f*PI/4.0f));
-          if(isOutOfBounds(goals[i].x, goals[i].y)) {
-            if(i%2== 0) {
-              goals[i].y+=  s*r;
-            }
-            else  {
-              goals[i].x+=  s*r;
-              s++;
-            }
-          }
-          goals[i].x= clamp(goals[i].x, -6.0f, 6.0f);
-          goals[i].y= clamp(goals[i].y, -6.0f, 6.0f);
-      }
-    */
 
     }
   }else{
@@ -364,7 +217,6 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
 
   // goal location should be relative to board coordinates
   resultPos = nextGoal(currentLocation);
-
   goalLocation.x = resultPos.x;
   goalLocation.y = resultPos.y;
 
@@ -379,79 +231,49 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
  * center or collisions.
  */
 geometry_msgs::Pose2D SearchController::continueInterruptedSearch(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D oldGoalLocation) {
+  //ROS_INFO_STREAM_ONCE("Continue Search After Interrupt");
   geometry_msgs::Pose2D newGoalLocation;
+
   Pos2D resultPos;
+  resultPos.x = goals[currIndex].x;
+  resultPos.y = goals[currIndex].y;
+  resultPos = roverWorldCoordAdjust(resultPos, name);
 
-  //remainingGoalDist avoids magic numbers by calculating the dist
-  double remainingGoalDist = hypot(oldGoalLocation.x - currentLocation.x, oldGoalLocation.y - currentLocation.y);
-
-
-  //this of course assumes random walk continuation. Change for diffrent search methods.
-  //newGoalLocation.theta = oldGoalLocation.theta;
-  //newGoalLocation.x = currentLocation.x + (0.50 * cos(oldGoalLocation.theta));// (remainingGoalDist * cos(oldGoalLocation.theta));
-  //newGoalLocation.y = currentLocation.y + (0.50 * sin(oldGoalLocation.theta));// (remainingGoalDist * sin(oldGoalLocation.theta));
-    
-  //This makes the rover push to old location after interrupt.. basically ignoring the interrupt
-  newGoalLocation.x = goals[currIndex].x;
-  newGoalLocation.y = goals[currIndex].y;
+  //This makes the rover push to old location after interrupt... basically ignoring the interrupt
+  newGoalLocation.x = resultPos.x;
+  newGoalLocation.y = resultPos.y;
   double myHeading = atan2(newGoalLocation.y - currentLocation.y, newGoalLocation.x - currentLocation.x);
   newGoalLocation.theta = myHeading;
-  //ROS_INFO_STREAM_ONCE("Interrupt");
-
-  if(name=="achilles"){ //black rover
-      // This rover starts at (0,1) so subtract 1 from goalLocation.y 
-    newGoalLocation.y-=1.0;
-  }
-  if(name=="aeneas"){ //yellow rover
-    // This rover starts at (1,1) so subtract 1 from goalLocation.y and x
-    newGoalLocation.x-=1.0;
-    newGoalLocation.y-=1.0;
-  }
-  if(name=="ajax"){ //white rover
-    // This rover starts at (1,0) so subtract 1 from goalLocation.x
-    newGoalLocation.x-=1.0;
-  }
-
+  
   return newGoalLocation;
 }
-//sendClawCommand(M_PI_2);
 
+
+// COS nextGoal Method iterates through the waypoints
 Pos2D SearchController::nextGoal(geometry_msgs::Pose2D currentLocation){
   Pos2D goal;
   double _distance;
-  /*if(!isInitiated){
-    //The first point on the board to go to here:
-    goal.x=goals[0].x;
-    goal.y=goals[0].y;
-    isInitiated=  true;
-  }else*/{
-    _distance = sqrt(pow(currentLocation.x-goals[currIndex].x,2.0)+pow(currentLocation.y-goals[currIndex].y,2.0));
-    //ROS_INFO_STREAM("COS: published name: "<<name<<" distance "<<_distance << " to "<< currIndex);
+      
+  //cycle index back to one to repeat path
+  currIndex = currIndex%GOAL_SIZE;
+  if(fabs(goals[currIndex].y)>6.0f){
+      currIndex=0;
+  }
+  _distance = sqrt(pow(currentLocation.x-goals[currIndex].x,2.0)+pow(currentLocation.y-goals[currIndex].y,2.0));
+  //ROS_INFO_STREAM("COS: published name: "<<name<<" distance "<<_distance << " to "<< currIndex);
 
-    // go to next waypoint when goal is reached
-    if(_distance<1.5){
-      currIndex++;
-      currIndex = currIndex%GOAL_SIZE;
-      //ROS_INFO_STREAM("NEW WAYPOINT "<<currIndex << " for "<< name);
-      goal.x=goals[currIndex].x;
-      goal.y=goals[currIndex].y;
-    }
+  // go to next waypoint when goal is reached
+  if(_distance<1.5){
+    currIndex++;
+    //currIndex = currIndex%GOAL_SIZE;
+    //ROS_INFO_STREAM("NEW WAYPOINT "<<currIndex << " for "<< name);
+    goal.x=goals[currIndex].x;
+    goal.y=goals[currIndex].y;
   }
 
-  if(name=="achilles"){ //black rover
-      // This rover starts at (0,1) so subtract 1 from goalLocation.y 
-    goal.y-=1.0;
-  }
-  if(name=="aeneas"){ //yellow rover
-    // This rover starts at (1,1) so subtract 1 from goalLocation.y and x
-    goal.x-=1.0;
-    goal.y-=1.0;
-  }
-  if(name=="ajax"){ //white rover
-    // This rover starts at (1,0) so subtract 1 from goalLocation.x
-    goal.x-=1.0;
-  }
-  
+  Pos2D adjustedGoal = roverWorldCoordAdjust(goal, name);
+  goal.x = adjustedGoal.x;
+  goal.y = adjustedGoal.y;
 
   return goal;
 }

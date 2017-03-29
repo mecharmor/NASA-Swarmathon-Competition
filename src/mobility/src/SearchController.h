@@ -49,7 +49,7 @@ class SearchController {
   private:
 
     random_numbers::RandomNumberGenerator* rng;
-    //The Cornerstone Algorithm (Array goal Corner sweep search algorithm)
+    //The HeX Sweep Algorithm (Goal array waypoints for search algorithm)
     Pos2D goals[GOAL_SIZE];
     bool  isInitiated;
     int currIndex;

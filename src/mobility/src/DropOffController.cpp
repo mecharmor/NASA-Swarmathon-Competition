@@ -1,11 +1,10 @@
 #include "DropOffController.h"
-#include <ros/ros.h>
 
 DropOffController::DropOffController() {
     cameraOffsetCorrection = 0.020; //meters
     centeringTurn = 0.15; //radians
-    seenEnoughCenterTagsCount = 8;  //COS changed from 10
-    collectionPointVisualDistance = 0.5;
+    seenEnoughCenterTagsCount = 10;
+    collectionPointVisualDistance = 0.5; //in meters
     reachedCollectionPoint = false;
     spinSize = 0.10; //in meters aka 10cm 
     addSpinSizeAmmount = 0.10; //in meters
@@ -32,14 +31,12 @@ DropOffController::DropOffController() {
     circularCenterSearching = false;
     prevCount = 0;
 
-    searchVelocity = 0.15; 
+    searchVelocity = 0.15;
 }
 
 
 
 void DropOffController::calculateDecision() {
-
-    ROS_INFO_STREAM("Drop-Off Controller Calculating Decision ");
 
     result.goalDriving = true; //assumewe are driving to the center unless we see targets or have seen targets.
     result.timer = false;
@@ -83,10 +80,8 @@ void DropOffController::calculateDecision() {
         result.centerGoal.x = centerLocation.x;
         result.centerGoal.y = centerLocation.y;
         //spinWasTrue = true; only turn on for random walk to center
-        //ROS_INFO_STREAM("DROPOFF centerGoal.x "<<result.centerGoal.x<<" and y "<<result.centerGoal.y);
-
     }
-    else if (timerTimeElapsed >=5)//spin search for center  COS: was 5
+    else if (timerTimeElapsed >=5)//spin search for center
     {
         //sets a goal that is 60cm from the centerLocation and spinner
         //radians counterclockwise from being purly along the x-axis.
@@ -94,7 +89,7 @@ void DropOffController::calculateDecision() {
         result.centerGoal.y = centerLocation.y + (spinSize + addSpinSize) * sin(spinner);
         result.centerGoal.theta = atan2(result.centerGoal.y - currentLocation.y, result.centerGoal.x - currentLocation.x);
 
-        spinner += 45*(M_PI/180); //add 45 degrees in radians to spinner. 
+        spinner += 45*(M_PI/180); //add 45 degrees in radians to spinner.
         if (spinner > 2*M_PI)
         {
             spinner -= 2*M_PI;
