@@ -333,6 +333,8 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                 // calculate the euclidean distance between
                 // centerLocation and currentLocation
 
+                centerLocation.x=0;
+                centerLocation.y=0;
 
                 //COS: takes rover coords and returns world coords
                 //COS adjustments to world coordinates
