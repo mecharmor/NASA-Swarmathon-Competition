@@ -44,6 +44,19 @@ Pos2D roverWorldCoordAdjust(Pos2D arg, std::string argName){
     // This rover starts at (1,0) so subtract 1 from goalLocation.x
     arg.x-=1.0;
   }
+  if(argName=="diomedes"){ //red rover
+    // This rover starts at (1,0) so subtract 1 from goalLocation.x
+    arg.x+= 1;
+  }
+  if(argName=="hector"){ //blue rover
+    // This rover starts at (1,0) so subtract 1 from goalLocation.x
+    arg.y+= 1;
+  }
+  if(argName=="paris"){ //orange rover
+    // This rover starts at (1,0) so subtract 1 from goalLocation.x
+    arg.x+= 1;
+    arg.y+= 1;
+  }
 
   return arg;
 }
@@ -209,6 +222,227 @@ geometry_msgs::Pose2D SearchController::search(geometry_msgs::Pose2D currentLoca
       }    
 
     }
+    else if(publishedName=="diomedes"){ //Red rover
+      
+      // set waypoints with respect to the board origin
+      // rough start to try to avoid other rovers at start
+      goals[0].x= 0;
+      goals[0].y= 9;
+      goals[1].x= -9;
+      goals[1].y= 9;
+      goals[2].x= -9;
+      goals[2].y= 0;
+      goals[3].x= -9;
+      goals[3].y= -9;
+      goals[4].x= -8.5f;
+      goals[4].y= -9;
+      goals[5].x= -8.5f;
+      goals[5].y= 0;
+      goals[6].x= -8.5f;
+      goals[6].y= 8.5f;
+      goals[7].x= 0;
+      goals[7].y= 8.5f;
+      goals[8].x= 0;
+      goals[8].y= 7;
+      goals[9].x= -7;
+      goals[9].y= 7;
+      goals[10].x= -7;
+      goals[10].y= -7;
+      goals[11].x= -5;
+      goals[11].y= -7;
+      goals[12].x= -5;
+      goals[12].y= 6;
+      goals[13].x= -9;
+      goals[13].y= 9;
+ /*
+      goals[0].x = 0;
+      goals[0].y = 9.5f;
+      goals[1].x= -9.5f;
+      goals[1].y= 9.5f;
+
+      float r= 0.5f;
+      bool clockwise=true;
+      int skip= 0;
+       for(int i=3; i< GOAL_SIZE; i++) {
+         if(skip== 0) {
+           if(clockwise)  {
+             goals[i].x=  (9.5f-r)*cos(220*PI/180.0f);
+             goals[i].y=  (9.5f-r)*sin(220*PI/180.0f);
+             r+=  0.5f;
+           }
+           else {
+             goals[i].x=  0.0f;
+             goals[i].y=  9.5f-r;
+             r+=  0.5f;
+           }
+           skip++;
+         }
+
+         if(skip== 1) {
+           if(clockwise)  {
+             goals[i].x=  (9.5f-r)*cos(220*PI/180.0f);
+             goals[i].y=  (9.5f-r)*sin(220*PI/180.0f);
+             clockwise= false;
+           }
+           else {
+             goals[i].x=  0.0f;
+             goals[i].y=  9.5f-r;
+             clockwise= true;
+           }
+           skip++;
+         }
+         if(skip== 2)  { // Corners
+            goals[i].x= -9.5f-r;
+            goals[i].y= 9.5f-r;
+            skip= 0;
+         }
+      }
+*/
+    }
+    // Sets Waypoint array once
+    if(publishedName=="hector"){ //blue rover
+      float _cos= cos(315*PI/180.0f);
+      float _sin= sin(315*PI/180.0f);
+
+      goals[0].x= 9.5f*_cos;
+      goals[0].y= 9.5f*_sin;
+      goals[1].x= 9.5f;
+      goals[1].y= 9.5f;
+      goals[2].x= 0;
+      goals[2].y= 9.5f;
+      goals[3].x= 0;
+      goals[3].y= 9;
+      goals[4].x= 9;
+      goals[4].y= 9;
+      goals[5].x= 9*_cos;
+      goals[5].y= 9*_sin;
+      goals[6].x= 8.5f*_cos;
+      goals[6].y= 8.5f*_sin;
+      goals[7].x= 8.5f;
+      goals[7].y= 8.5f;
+      goals[8].x= 0;
+      goals[8].y= 8.5f;
+      goals[9].x= 0;
+      goals[9].y= 8;
+      goals[10].x= 8;
+      goals[10].y= 8;
+      goals[11].x= 8*_cos;
+      goals[11].y= 8*_sin;
+
+      /*
+      goals[0].x= 9.5f*cos(315*PI/180.0f);
+      goals[0].y= 9.5f*sin(315*PI/180.0f);
+      goals[1].x= 9.5f;
+      goals[1].y= 9.5f;
+
+      float r= 0.5f;
+      bool clockwise=true;
+      int skip= 0;*/
+      /*
+       for(int i=3; i< GOAL_SIZE; i++) {
+         if(skip== 0) {
+           if(clockwise)  {
+             goals[i].x=  0.0f;
+             goals[i].y=  9.5f-r;
+             r+=  0.5f;
+           }
+           else {
+             goals[i].x=  (9.5f-r)*cos(315*PI/180.0f);
+             goals[i].y=  (9.5f-r)*sin(315*PI/180.0f);
+             r+=  0.5f;
+           }
+             skip++;
+         }
+
+         if(skip== 1) {
+           if(clockwise)  {
+             goals[i].x=  0.0f;
+             goals[i].y=  9.5f-r;
+             clockwise= false;
+           }
+           else {
+             goals[i].x=  (9.5f-r)*cos(315*PI/180.0f);
+             goals[i].y=  (9.5f-r)*sin(315*PI/180.0f);
+             clockwise=true;
+           }
+           skip++;
+         }
+         if(skip== 2)  { // Corners
+            goals[i].x= 9.5f-r;
+            goals[i].y= 9.5f-r;
+            skip= 0;
+         }
+      }
+      */
+    }
+    if(publishedName=="paris"){ //orange rover
+      bool  clockwise=  true;
+      int r=  1;
+      float theta= tan(220*PI/180.0f);
+      float phi=  tan(315*PI/180.0f);
+
+      for(int i= 0; i< GOAL_SIZE; i++)  {
+        if(clockwise) {
+          goals[i].x= (-9.5f+0.5f*r)/theta;
+          goals[i].y= (-9.5f+0.5f*r);
+          i++;
+          goals[i].x= (-9.5f+0.5f*r)/phi;
+          goals[i].y= (-9.5f+0.5f*r);
+          clockwise=  false;
+        }
+        else  {
+          goals[i].x= (-9.5f+0.5f*r)/phi;
+          goals[i].y= (-9.5f+0.5f*r);
+          i++;
+          goals[i].x= (-9.5f+0.5f*r)/theta;
+          goals[i].y= (-9.5f+0.5f*r);
+          clockwise=  true;
+        }
+      }
+      /*
+      // set waypoints with respect to the board origin
+      // rough start to try to avoid other rovers at start
+      goals[0].x= 9.5f*cos(220*PI/180.0f);
+      goals[0].y= 9.5f*sin(220*PI/180.0f);
+      goals[1].x= 9.5f*cos(315*PI/180.0f);
+      goals[1].y= 9.5f*sin(315*PI/180.0f);
+
+      float r= 0.5f;
+      bool clockwise=false;
+      bool  skip= false;
+ 
+       for(int i=3; i< GOAL_SIZE; i++) {
+         if(clockwise)  {
+           if(!skip) {
+             goals[i].x=  (9.5f-r)*cos(315*PI/180.0f);
+             goals[i].y=  (9.5f-r)*cos(315*PI/180.0f);
+             r+=  0.5f;
+             skip=  true;
+           }
+           else {
+             goals[i].x=  (9.5f-r)*cos(315*PI/180.0f);
+             goals[i].y=  (9.5f-r)*cos(315*PI/180.0f);
+             skip=  false;
+             clockwise= false;
+           }
+         }
+         else {
+           if(!skip)  {
+            goals[i].x= (9.5f-r)*cos(220*PI/180.0f);
+            goals[i].y= (9.5f-r)*sin(220*PI/180.0f);
+            r+= 0.5f;
+            skip= true;
+           }
+           else {
+            goals[i].x= (9.5f-r)*cos(220*PI/180.0f);
+            goals[i].y= (9.5f-r)*sin(220*PI/180.0f);
+            skip= false;
+            clockwise=  true;
+           }
+         }
+      }
+*/
+    }
   }else{
     //is initialized
     //ROS_INFO_STREAM("Which Rover Search Called "<<name);
@@ -255,7 +489,15 @@ Pos2D SearchController::nextGoal(geometry_msgs::Pose2D currentLocation){
   double _distance;
       
   //cycle index back to one to repeat path
-  currIndex = currIndex%GOAL_SIZE;
+  if(name== "diomedes") {
+    currIndex%= 14;
+  }
+  else if(name== "hector")  {
+    currIndex%= 12;
+  }
+  else  {
+    currIndex = currIndex%GOAL_SIZE;
+  }
   if(fabs(goals[currIndex].y)>6.0f){
       currIndex=0;
   }

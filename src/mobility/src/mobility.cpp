@@ -183,6 +183,19 @@ geometry_msgs::Pose2D adjustCenterToWorldCoords(geometry_msgs::Pose2D arg, std::
         // This rover starts at (1,0) so subtract 1 from goalLocation.x
         adjustedCenterLocation.x-=1.0;
     }
+    if(argName=="diomedes"){ //red rover
+        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+        adjustedCenterLocation.x+=  1;
+    }
+    if(argName=="hector"){ //blue rover
+        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+        adjustedCenterLocation.y+=  1;
+    }
+    if(argName=="paris"){ //orange rover
+        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+        adjustedCenterLocation.x+=  1;
+        adjustedCenterLocation.y+=  1;
+    }
 }
 
 int main(int argc, char **argv) {
@@ -350,6 +363,19 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                     if(publishedName=="ajax"){ //white rover
                         // This rover starts at (1,0) so subtract 1 from goalLocation.x
                         centerLocation.x-=1.0;
+                    }
+                    if(publishedName=="diomedes"){ //red rover
+                        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+                        centerLocation.x+=  1;
+                    }
+                    if(publishedName=="hector"){ //blue rover
+                        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+                        centerLocation.y+=  1;
+                    }
+                    if(publishedName=="paris"){ //orange rover
+                        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+                        centerLocation.x+=  1;
+                        centerLocation.y+=  1;
                     }
                 //End cos Adjustment
                 
@@ -532,6 +558,19 @@ void mobilityStateMachine(const ros::TimerEvent&) {
                         // This rover starts at (1,0) so subtract 1 from goalLocation.x
                         goalLocation.x-=1.0;
                     }
+                    if(publishedName=="diomedes"){ //red rover
+                        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+                        goalLocation.x+=    1;
+                    }
+                    if(publishedName=="hector"){ //blue rover
+                        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+                        goalLocation.y+=    1;
+                    }
+                    if(publishedName=="paris"){ //orange rover
+                        // This rover starts at (1,0) so subtract 1 from goalLocation.x
+                        goalLocation.x+=    1;
+                        goalLocation.y+=    1;
+                    }
 
                     goalLocation.theta = atan2(goalLocation.y - currentLocation.y, goalLocation.x - currentLocation.x);
 
@@ -709,7 +748,9 @@ void obstacleHandler(const std_msgs::UInt8::ConstPtr& message) {
         }
 
         // continues an interrupted search
-        goalLocation = searchController.continueInterruptedSearch(currentLocation, goalLocation);
+        //COS: changed.
+        if(!targetCollected)
+            goalLocation = searchController.continueInterruptedSearch(currentLocation, goalLocation);
 
         // switch to transform state to trigger collision avoidance
         stateMachineState = STATE_MACHINE_ROTATE;
