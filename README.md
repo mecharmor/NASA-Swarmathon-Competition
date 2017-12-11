@@ -1,5 +1,10 @@
 #H1 Swarmathon-COS Log
 
+12/8/2017 We formed a team, installed linux and the swarmathon software on 3 machines located in our lab. In addition, we made a team video showing that we can move a rover in a square.  We did not upload the code to gitHub yet: https://youtu.be/FguqxOJc-tU
+
+
+
+2017 log below ************************
 Initial commit of src/mobility folder
 
 Weekly activity log:
