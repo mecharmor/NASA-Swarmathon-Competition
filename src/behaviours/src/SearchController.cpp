@@ -27,8 +27,6 @@ Result SearchController::DoWork() {
 
   Point  searchLocation;
 
-  
-
   searchLocation.x = 5.0;
   searchLocation.y = 5.0;
   //COS MOD - Result Type = WayPoint - 12/15/2017 - John Redden
