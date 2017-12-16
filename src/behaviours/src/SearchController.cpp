@@ -29,7 +29,7 @@ Result SearchController::DoWork() {
 
   searchLocation.x = 5.0;
   searchLocation.y = 5.0;
-  //COS MOD - Result Type = WayPoint - 12/15/2017 - JohnR
+  //COS MOD - Result Type = WayPoint - 12/15/2017 - John Redden
   result.type = waypoint;
   result.wpts.waypoints.clear();
   result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
