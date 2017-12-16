@@ -25,6 +25,29 @@ void SearchController::Reset() {
  */
 Result SearchController::DoWork() {
 
+  Point  searchLocation;
+
+  searchLocation.x = 5.0;
+  searchLocation.y = 5.0;
+  //COS MOD - Result Type = WayPoint
+  result.type = waypoint;
+  result.wpts.waypoints.clear();
+  result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+  searchLocation.x = 5.0;
+  searchLocation.y = -5.0;
+  result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+  searchLocation.x = -5.0;
+  searchLocation.y = -5.0;
+  result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+  searchLocation.x = -5.0;
+  searchLocation.y = 5.0;
+  result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+  return result;
+/*
   if (!result.wpts.waypoints.empty()) {
     if (hypot(result.wpts.waypoints[0].x-currentLocation.x, result.wpts.waypoints[0].y-currentLocation.y) < 0.15) {
       attemptCount = 0;
@@ -68,7 +91,7 @@ Result SearchController::DoWork() {
     
     return result;
   }
-
+*/
 }
 
 void SearchController::SetCenterLocation(Point centerLocation) {
