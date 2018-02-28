@@ -25,6 +25,7 @@ public:
   //void UpdateData(geometry_msgs::Pose2D currentLocation, geometry_msgs::Pose2D centerLocation);
   void SetCurrentLocation(Point currentLocation);
   void SetCenterLocation(Point centerLocation);
+  void SetRoverName(string name);
   void SetSuccesfullPickup();
 
 protected:
@@ -40,6 +41,8 @@ private:
   int attemptCount = 0;
   //struct for returning data to ROS adapter
   Result result;
+  string roverName;
+  
 
   // Search state
   // Flag to allow special behaviour for the first waypoint

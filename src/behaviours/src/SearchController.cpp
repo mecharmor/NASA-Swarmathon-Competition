@@ -25,28 +25,85 @@ void SearchController::Reset() {
  */
 Result SearchController::DoWork() {
 
-  Point  searchLocation;
 
-  searchLocation.x = 5.0;
-  searchLocation.y = 5.0;
-  //COS MOD - Result Type = WayPoint - 12/15/2017 - John Redden
-  result.type = waypoint;
-  result.wpts.waypoints.clear();
-  result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
 
-  searchLocation.x = 5.0;
-  searchLocation.y = -5.0;
-  result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+if(roverName=="achilles"){
+    result.type = waypoint;
 
-  searchLocation.x = -5.0;
-  searchLocation.y = -5.0;
-  result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+    Point  searchLocation;
 
-  searchLocation.x = -5.0;
-  searchLocation.y = 5.0;
-  result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+    // setting int waypoint
+    searchLocation.theta = currentLocation.theta;
+    searchLocation.x = -5;
+    searchLocation.y = 5;
 
-  return result;
+    result.wpts.waypoints.clear();
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+    
+    searchLocation.x = -5;
+    searchLocation.y = 4;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+    
+    searchLocation.x = -4;
+    searchLocation.y = 4;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+    
+    searchLocation.x = -4;
+    searchLocation.y = 5;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+} else if ( roverName == "ajax"){
+    result.type = waypoint;
+
+    Point  searchLocation;
+
+    // setting int waypoint
+    searchLocation.theta = currentLocation.theta;
+    searchLocation.x = 5;
+    searchLocation.y = 5;
+
+    result.wpts.waypoints.clear();
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+    
+    searchLocation.x = 5;
+    searchLocation.y = 4;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+    
+    searchLocation.x = 4;
+    searchLocation.y = 4;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+    
+    searchLocation.x = 4;
+    searchLocation.y = 5;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+} else if ( roverName == "aeneas"){
+    result.type = waypoint;
+
+    Point  searchLocation;
+
+    // setting int waypoint
+    searchLocation.theta = currentLocation.theta;
+    searchLocation.x = -2;
+    searchLocation.y = -5;
+
+    result.wpts.waypoints.clear();
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+    
+    searchLocation.x = 2;
+    searchLocation.y = -5;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+    
+    searchLocation.x = 2;
+    searchLocation.y = -4;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+    
+    searchLocation.x = -2;
+    searchLocation.y = -4;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+}
+
 /*
   if (!result.wpts.waypoints.empty()) {
     if (hypot(result.wpts.waypoints[0].x-currentLocation.x, result.wpts.waypoints[0].y-currentLocation.y) < 0.15) {
@@ -88,10 +145,12 @@ Result SearchController::DoWork() {
 
     result.wpts.waypoints.clear();
     result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+    */
     
     return result;
-  }
-*/
+  
+
 }
 
 void SearchController::SetCenterLocation(Point centerLocation) {
@@ -106,6 +165,11 @@ void SearchController::SetCenterLocation(Point centerLocation) {
   result.wpts.waypoints.back().y -= diffY;
   }
   
+}
+
+void SearchController::SetRoverName(string name){
+  roverName = name;
+  cout << roverName << endl;
 }
 
 void SearchController::SetCurrentLocation(Point currentLocation) {

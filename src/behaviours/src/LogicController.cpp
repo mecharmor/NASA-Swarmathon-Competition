@@ -226,7 +226,6 @@ void LogicController::ProcessData()
     };
   }
   else if (processState == PROCESS_STATE_MANUAL) {
-    // under manual control only the manual waypoint controller is active
     prioritizedControllers = {
       PrioritizedController{-1, (Controller*)(&searchController)},
       PrioritizedController{-1, (Controller*)(&obstacleController)},
@@ -330,6 +329,12 @@ void LogicController::SetCenterLocationOdom(Point centerLocationOdom)
 {
   searchController.SetCenterLocation(centerLocationOdom);
   dropOffController.SetCenterLocation(centerLocationOdom);
+}
+
+// Passes Rover name to Search Controller
+void LogicController::SetRoverName(string RoverName)
+{
+  searchController.SetRoverName(RoverName);
 }
 
 void LogicController::AddManualWaypoint(Point manualWaypoint, int waypoint_id)
