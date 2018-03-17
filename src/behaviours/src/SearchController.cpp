@@ -195,6 +195,63 @@ if(roverName=="achilles"){ //black rover
   }
 return result;
   }
+  // Geralds Walk
+  else if (searchMode == 2){
+    cout << "Gerald Walk" << endl;
+    if (!result.wpts.waypoints.empty()) {
+    cout << "test1" << endl;
+    attemptCount = 0;
+  }
+
+  if (attemptCount > 0 && attemptCount < 5) {
+    attemptCount++;
+    if (succesfullPickup) {
+      succesfullPickup = false;
+      attemptCount = 1;
+    }
+    return result;
+  }
+  else if (attemptCount >= 5 || attemptCount == 0) 
+  {
+    attemptCount = 1;
+
+
+    result.type = waypoint;
+    Point  searchLocation;
+
+    result.wpts.waypoints.clear();
+
+    if (first_waypoint)
+    {
+      cout << "init 180" << endl;
+      first_waypoint = false;
+
+      // Set first waypoint facing away from the center
+      searchLocation.theta = currentLocation.theta + M_PI;
+      searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
+      searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
+
+      result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+      cout << first_waypoint << endl;
+      
+
+    }
+
+    cout << "x: " << currentLocation.x << endl;
+    searchLocation.theta = currentLocation.theta + 0.575959;
+    searchLocation.x = currentLocation.x + (0.5 * cos(searchLocation.theta));
+    searchLocation.y = currentLocation.y + (0.5 * sin(searchLocation.theta));
+
+    
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(), searchLocation);
+
+    
+    
+    return result;
+
+  }
+  }
 }
 
 void SearchController::SetCenterLocation(Point centerLocation) {

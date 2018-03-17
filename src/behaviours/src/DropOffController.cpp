@@ -76,15 +76,30 @@ Result DropOffController::DoWork() {
     return result;
   }
 
+  double distanceToY = this->currentLocation.y - this->centerLocation.y;//finds distance from current location to y axis
+  double distanceToX = this->currentLocation.x - this->centerLocation.x; //finds current location from x axis
+  
+  result.wpts.waypoints.clear();
+  Point searchLocation; //Move to the closest axis, then begin to move toward goal.
+  if(distanceToY > distanceToX){
+    searchLocation.x = 0;
+    searchLocation.y = currentLocation.y;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(),searchLocation);
+  }else if(distanceToX > distanceToY){
+    searchLocation.x = currentLocation.x;
+    searchLocation.y = 0;
+    result.wpts.waypoints.insert(result.wpts.waypoints.begin(),searchLocation);
+  }
+  
   double distanceToCenter = hypot(this->centerLocation.x - this->currentLocation.x, this->centerLocation.y - this->currentLocation.y);
 
   //check to see if we are driving to the center location or if we need to drive in a circle and look.
   if (distanceToCenter > collectionPointVisualDistance && !circularCenterSearching && (count == 0)) {
 
     result.type = waypoint;
-    result.wpts.waypoints.clear();
     result.wpts.waypoints.push_back(this->centerLocation);
     startWaypoint = false;
+     
     isPrecisionDriving = false;
 
     timerTimeElapsed = 0;

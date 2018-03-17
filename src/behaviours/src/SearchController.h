@@ -47,7 +47,7 @@ private:
   // Search mode will determine what algo to run
   // 0 == random walk
   // 1 == COS waypoint
-  int searchMode = 1;
+  int searchMode = 2;
   
 
   // Search state
