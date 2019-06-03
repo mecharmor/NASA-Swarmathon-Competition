@@ -2,7 +2,7 @@
 Note: ALL git commits were from same contributor due to issues with Swarmathon compatibility on hardware
 
 ## Introduction
-- 12/8/2017 We formed a team, installed linux and the swarmathon software on 3 machines located in our lab. In addition, we made a team video showing that we can move a rover in a square. Swarmathon Discussion: https://youtu.be/FguqxOJc-tU
+The NASA Swarmathon is a challenge to develop cooperative robotics to revolutionize space exploration.  The Fourth Annual Swarmathon competition will be held in May, 2019. The application period has now closed.  Students will be challenged to develop search algorithms for robotic swarms. Swarmathon participation will:  (1) improve student’s skills in robotics and computer science and (2) further advance technology for future NASA space exploration missions.
 
 ## What is R.O.S?
 - Robot Operating System framework used for nasa swarmies
@@ -11,9 +11,9 @@ Note: ALL git commits were from same contributor due to issues with Swarmathon c
   - Rapid testing
 
 ## Presentations/Results
-[Swarmathon Final Presentation Recording](https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2F110063355695640%2Fvideos%2F1314851381883492%2F&show_text=0&width=560)
-
-Final Score for College of the Sequoias (Made it to Quarter finals, 5th place) : http://nasaswarmathon.com/2017-scores/
+- Team video showing that we can move a rover in a square. Swarmathon Discussion: https://youtu.be/FguqxOJc-tU
+- [Swarmathon Final Presentation Recording](https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2F110063355695640%2Fvideos%2F1314851381883492%2F&show_text=0&width=560)
+- Final Score for College of the Sequoias (Made it to Quarter finals, 5th place) : http://nasaswarmathon.com/2017-scores/
 
 > Updated on: 06/02/19, Cory Lewis
 
