@@ -1,3 +1,9 @@
+
+REFER TO THIS BRANCH FOR WORK COMPLETED BY `Cory Lewis` : https://github.com/mecharmor/NASA-Swarmathon-Competition/blob/Swarm16-17/README.md
+
+-------------------------------------------------------------------------------------------------------------------
+
+
 # SwarmBaseCode-ROS
 
 This repository is a ROS (Robot Operating System) controller framework for the Swarmie robots used in the [NASA Swarmathon](http://www.nasaswarmathon.com), a national swarm robotics competition. 
